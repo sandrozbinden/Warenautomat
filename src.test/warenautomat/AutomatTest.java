@@ -136,4 +136,47 @@ public class AutomatTest {
         assertEquals(1150, Kasse.gibRappen(automat.gibTotalenWarenWert()));
     }
 
+    @Test
+    public void testVerkaufsstatistik() throws ParseException {
+        SystemSoftware.setzeAktuellesDatum(df.parse("01.01.2000"));
+        automat.fuelleFach(1, "Eins", 1.00, df.parse("01.01.2100"));
+        automat.gibKasse().einnehmen(1);
+        assertEquals(0, automat.gibVerkaufsStatistik("Eins", df.parse("01.01.2000")));
+        automat.oeffnen(1);
+        assertEquals(1, automat.gibVerkaufsStatistik("Eins", df.parse("01.01.2000")));
+    }
+
+    @Test
+    public void testVerkaufsstatistik1() throws ParseException {
+        SystemSoftware.setzeAktuellesDatum(df.parse("01.01.2000"));
+        automat.fuelleFach(1, "Eins", 1.00, df.parse("01.01.2100"));
+        automat.fuelleFach(2, "Eins", 1.00, df.parse("01.01.2100"));
+        automat.gibKasse().einnehmen(1);
+        automat.gibKasse().einnehmen(1);
+        automat.oeffnen(1);
+        SystemSoftware.setzeAktuellesDatum(df.parse("01.02.2000"));
+        automat.oeffnen(2);
+        assertEquals(2, automat.gibVerkaufsStatistik("Eins", df.parse("01.01.2000")));
+    }
+
+    @Test
+    public void testVerkaufsstatistik2() throws ParseException {
+        SystemSoftware.setzeAktuellesDatum(df.parse("01.01.2000"));
+        automat.fuelleFach(1, "Eins", 1.00, df.parse("01.01.2100"));
+        automat.fuelleFach(2, "Eins", 1.50, df.parse("01.01.2100"));
+        automat.fuelleFach(3, "Zwei", 1.00, df.parse("01.01.2100"));
+        automat.fuelleFach(4, "Eins", 1.00, df.parse("01.01.2100"));
+        automat.gibKasse().einnehmen(1);
+        automat.gibKasse().einnehmen(1);
+        automat.oeffnen(1);
+        SystemSoftware.setzeAktuellesDatum(df.parse("01.02.2000"));
+        automat.oeffnen(2);
+        automat.gibKasse().einnehmen(1);
+        automat.gibKasse().einnehmen(0.5);
+        automat.oeffnen(3);
+        automat.gibKasse().einnehmen(1);
+        automat.oeffnen(4);
+        assertEquals(2, automat.gibVerkaufsStatistik("Eins", df.parse("10.01.2000")));
+    }
+
 }

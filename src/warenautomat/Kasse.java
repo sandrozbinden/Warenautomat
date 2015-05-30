@@ -204,7 +204,7 @@ public class Kasse {
         verkaufteWare.add(new VerkaufteWare(ware.getWarenName(), ware.getPreis(), ware.getVerfallsDatum(), SystemSoftware.gibAktuellesDatum()));
     }
 
-    public List<VerkaufteWare> getVerkaufteWare() {
+    public List<VerkaufteWare> gibVerkaufteWare() {
         return verkaufteWare;
     }
 

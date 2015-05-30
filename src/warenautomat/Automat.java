@@ -163,7 +163,15 @@ public class Automat {
      * @return Anzahl verkaufter Waren.
      */
     public int gibVerkaufsStatistik(String pName, Date pDatum) {
-        throw new RuntimeException("Not implemented yet");
+        int totalVerkaufteWare = 0;
+        for (VerkaufteWare verkaufteWare : kassen.gibVerkaufteWare()) {
+            if (verkaufteWare.getWarenName().equals(pName)) {
+                if (SystemSoftware.gibAktuellesDatum().getTime() >= pDatum.getTime()) {
+                    totalVerkaufteWare = totalVerkaufteWare + 1;
+                }
+            }
+        }
+        return totalVerkaufteWare;
     }
 
 }
