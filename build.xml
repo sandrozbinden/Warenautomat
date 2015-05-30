@@ -1,0 +1,92 @@
+<project xmlns:jacoco="antlib:org.jacoco.ant" name="MyProject" default="compile" basedir=".">
+	<!-- set global properties for this build -->
+
+	<property name="src" location="src" />
+	<property name="src.test" location="src.test" />
+	<property name="build" location="build" />
+	<property name="dist" location="dist" />
+
+	<path id="lib.classpath" cache="true">
+		<pathelement path="lib/SystemSoftware.jar" />
+	</path>
+
+	<path id="junit.lib" cache="true">
+		<pathelement path="lib/junit-4.12.jar" />
+		<pathelement path="lib/hamcrest-all-1.3.jar" />
+	</path>
+
+	<taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
+		<classpath path="lib/jacocoant.jar" />
+	</taskdef>
+
+	<target name="init" depends="clean">
+		<tstamp />
+		<mkdir dir="${build}" />
+		<mkdir dir="${build}/classes" />
+		<mkdir dir="${build}/classes.test" />
+		<mkdir dir="${build}/testreport" />
+		<mkdir dir="${build}/coverage" />
+	</target>
+
+	<target name="compile" depends="init" description="compile the source ">
+
+		<javac srcdir="${src}" destdir="${build}/classes" source="1.7" target="1.7" debug="true" includeantruntime="false" debuglevel="source,lines,vars">
+			<classpath>
+				<path refid="lib.classpath" />
+			</classpath>
+		</javac>
+
+		<javac srcdir="${src.test}" destdir="${build}/classes.test" source="1.7" target="1.7" debug="true" includeantruntime="false" debuglevel="source,lines,vars">
+			<classpath>
+				<path refid="lib.classpath" />
+				<path refid="junit.lib" />
+				<pathelement path="${build}/classes" />
+			</classpath>
+		</javac>
+		<antcall target="test">
+		</antcall>
+		<antcall target="jacocoReport">
+		</antcall>
+	</target>
+
+	<target name="jacocoReport">
+		<jacoco:report>
+			<executiondata>
+				<file file="${build}/jacoco.exec" />
+			</executiondata>
+			<structure name="warenautomat">
+				<classfiles>
+					<fileset dir="${build}/classes" />
+				</classfiles>
+				<sourcefiles encoding="ISO-8859-1">
+					<fileset dir="src" />
+				</sourcefiles>
+			</structure>
+			<html destdir="${build}/coverage" />
+		</jacoco:report>
+	</target>
+	<target name="test">
+		<jacoco:coverage enabled="true" destfile="${build}/jacoco.exec">
+			<junit printsummary="yes" fork="yes" forkmode="once" haltonfailure="true" haltonerror="true" dir="${build}" showoutput="true">
+				<classpath>
+					<pathelement path="${build}/classes" />
+					<pathelement path="${build}/classes.test" />
+					<path refid="lib.classpath" />
+					<path refid="junit.lib" />
+				</classpath>
+				<formatter type="xml" />
+				<batchtest todir="${build}/testreport">
+					<fileset dir="${build}/classes.test">
+						<include name="**/**.class" />
+					</fileset>
+				</batchtest>
+			</junit>
+		</jacoco:coverage>
+	</target>
+
+	<target name="clean" description="clean up">
+		<!-- Delete the ${build} and ${dist} directory trees -->
+		<delete dir="${build}" />
+		<delete dir="${dist}" />
+	</target>
+</project>
