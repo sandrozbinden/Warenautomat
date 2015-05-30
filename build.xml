@@ -1,4 +1,4 @@
-<project xmlns:jacoco="antlib:org.jacoco.ant" name="MyProject" default="compile" basedir=".">
+<project xmlns:jacoco="antlib:org.jacoco.ant" name="MyProject" default="test" basedir=".">
 	<!-- set global properties for this build -->
 
 	<property name="src" location="src" />
@@ -43,10 +43,6 @@
 				<pathelement path="${build}/classes" />
 			</classpath>
 		</javac>
-		<antcall target="test">
-		</antcall>
-		<antcall target="jacocoReport">
-		</antcall>
 	</target>
 
 	<target name="jacocoReport">
@@ -65,7 +61,8 @@
 			<html destdir="${build}/coverage" />
 		</jacoco:report>
 	</target>
-	<target name="test">
+	
+	<target name="test" depends="compile">
 		<jacoco:coverage enabled="true" destfile="${build}/jacoco.exec">
 			<junit printsummary="yes" fork="yes" forkmode="once" haltonfailure="true" haltonerror="true" dir="${build}" showoutput="true">
 				<classpath>
@@ -82,6 +79,8 @@
 				</batchtest>
 			</junit>
 		</jacoco:coverage>
+		<antcall target="jacocoReport">
+		</antcall>
 	</target>
 
 	<target name="clean" description="clean up">
