@@ -207,26 +207,34 @@ public class Automat {
 
     private List<Ware> gibGueltigeWaren() {
         List<Ware> gueltigeWaren = new ArrayList<Ware>();
-        for (Drehteller drehteller : drehtellern) {
-            for (Fach fach : drehteller.gibFaecher()) {
-                if (fach.istVoll() && !fach.getWare().istAbgelaufen()) {
-                    gueltigeWaren.add(fach.getWare());
-                }
+        for (Ware ware : gibWaren()) {
+            if (!ware.istAbgelaufen()) {
+                gueltigeWaren.add(ware);
             }
         }
         return gueltigeWaren;
     }
 
     private List<Ware> gibAbgelaufeneWaren() {
-        List<Ware> gueltigeWaren = new ArrayList<Ware>();
+        List<Ware> abgelaufene = new ArrayList<Ware>();
+        for (Ware ware : gibWaren()) {
+            if (ware.istAbgelaufen()) {
+                abgelaufene.add(ware);
+            }
+        }
+        return abgelaufene;
+    }
+
+    private List<Ware> gibWaren() {
+        List<Ware> waren = new ArrayList<Ware>();
         for (Drehteller drehteller : drehtellern) {
             for (Fach fach : drehteller.gibFaecher()) {
-                if (fach.istVoll() && fach.getWare().istAbgelaufen()) {
-                    gueltigeWaren.add(fach.getWare());
+                if (fach.istVoll()) {
+                    waren.add(fach.getWare());
                 }
             }
         }
-        return gueltigeWaren;
+        return waren;
     }
 
     /**
