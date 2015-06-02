@@ -30,13 +30,13 @@
 
 	<target name="compile" depends="init" description="compile the source ">
 
-		<javac srcdir="${src}" destdir="${build}/classes" source="1.7" target="1.7" debug="true" includeantruntime="false" debuglevel="source,lines,vars">
+		<javac srcdir="${src}" destdir="${build}/classes" source="1.8" target="1.8" debug="true" includeantruntime="false" debuglevel="source,lines,vars">
 			<classpath>
 				<path refid="lib.classpath" />
 			</classpath>
 		</javac>
 
-		<javac srcdir="${src.test}" destdir="${build}/classes.test" source="1.7" target="1.7" debug="true" includeantruntime="false" debuglevel="source,lines,vars">
+		<javac srcdir="${src.test}" destdir="${build}/classes.test" source="1.8" target="1.8" debug="true" includeantruntime="false" debuglevel="source,lines,vars">
 			<classpath>
 				<path refid="lib.classpath" />
 				<path refid="junit.lib" />

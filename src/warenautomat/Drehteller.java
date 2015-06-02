@@ -1,5 +1,8 @@
 package warenautomat;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class Drehteller {
 
     private int drehtellerNummer;
@@ -16,12 +19,12 @@ public class Drehteller {
     }
 
     public void drehen() {
-        if (aktuellesFach.getFachNummer() == (MAX_FAECHER - 1)) {
-            aktuellesFach = faecher[0];
-        } else {
-            aktuellesFach = faecher[aktuellesFach.getFachNummer() + 1];
-        }
+        aktuellesFach = faecher[gibNeueAktuelleFachNummer()];
         aktualisiereDrehtellerAnzeige();
+    }
+
+    private int gibNeueAktuelleFachNummer() {
+        return aktuellesFach.getFachNummer() == (MAX_FAECHER - 1) ? 0 : aktuellesFach.getFachNummer() + 1;
     }
 
     public Fach getAktuellesFach() {
@@ -30,18 +33,20 @@ public class Drehteller {
 
     public void setzeWareInAktuellesFach(Ware ware) {
         aktuellesFach.setWare(ware);
+        aktualisiereDrehtellerAnzeige();
     }
 
     public void aktualisiereDrehtellerAnzeige() {
         SystemSoftware.zeigeWarenPreisAn(drehtellerNummer, aktuellesFach.getWarenPreis());
         SystemSoftware.zeigeVerfallsDatum(drehtellerNummer, aktuellesFach.getVerfallsDatumsZustand());
-        if (aktuellesFach.getWare() != null) {
-            SystemSoftware.zeigeWareInGui(drehtellerNummer, aktuellesFach.getWare().getWarenName(), aktuellesFach.getWare().getVerfallsDatum());
+        if (aktuellesFach.getWare().isPresent()) {
+            Ware ware = aktuellesFach.getWare().get();
+            SystemSoftware.zeigeWareInGui(drehtellerNummer, ware.getWarenName(), ware.getVerfallsDatum());
         }
     }
 
-    public Fach[] gibFaecher() {
-        return faecher;
+    public List<Fach> gibFaecher() {
+        return Arrays.asList(faecher);
     }
 
     public void leereAktuelesFach() {

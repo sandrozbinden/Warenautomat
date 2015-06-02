@@ -1,7 +1,10 @@
 package warenautomat;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Die Kasse verwaltet das eingenommene Geld sowie das Wechselgeld. <br>
@@ -68,12 +71,7 @@ public class Kasse {
     }
 
     private boolean istMuenzAuffuellBetragUnterstuetzt(int muenzBetragInRappen) {
-        for (Muenzsaeule muenzsaeule : muenzsaeulen) {
-            if (muenzsaeule.getMuenzartInRappen() == muenzBetragInRappen) {
-                return true;
-            }
-        }
-        return false;
+        return Arrays.stream(muenzsaeulen).filter(m -> m.getMuenzartInRappen() == muenzBetragInRappen).findAny().isPresent();
     }
 
     /**
@@ -147,8 +145,7 @@ public class Kasse {
      */
     public void gibWechselGeld() {
         if (istWechselGeldVorhanden(saldo.inFranken())) {
-            for (int i = muenzsaeulen.length - 1; i >= 0; i--) {
-                Muenzsaeule muenzsaeule = muenzsaeulen[i];
+            for (Muenzsaeule muenzsaeule : getReversedMuenzsaulen()) {
                 int ausgeworfeneMuenze = 0;
                 int saldoInRappen = saldo.inRappen();
                 while (saldoInRappen >= muenzsaeule.getMuenzartInRappen() && muenzsaeule.getMuenzAnzahl() > 0) {
@@ -169,11 +166,7 @@ public class Kasse {
      * @return Gesamtbetrag der bisher verkauften Waren.
      */
     public double gibBetragVerkaufteWaren() {
-        double betragVerkaufteWare = 0;
-        for (VerkaufteWare verkaufteWaree : verkaufteWaren) {
-            betragVerkaufteWare = betragVerkaufteWare + verkaufteWaree.getPreis();
-        }
-        return betragVerkaufteWare;
+        return verkaufteWaren.stream().map(w -> w.getPreis()).collect(Collectors.toList()).stream().reduce(0d, (a, b) -> a + b);
     }
 
     public int gibSaldoInRappen() {
@@ -186,8 +179,7 @@ public class Kasse {
 
     public boolean istWechselGeldVorhanden(double preis) {
         int preisInRappen = gibRappen(preis);
-        for (int i = muenzsaeulen.length - 1; i >= 0; i--) {
-            Muenzsaeule muenzsaeule = muenzsaeulen[i];
+        for (Muenzsaeule muenzsaeule : getReversedMuenzsaulen()) {
             int ausgeworfeneMuenze = 0;
             while (preisInRappen >= muenzsaeule.getMuenzartInRappen() && muenzsaeule.getMuenzAnzahl() > 0) {
                 preisInRappen = preisInRappen - muenzsaeule.getMuenzartInRappen();
@@ -199,19 +191,19 @@ public class Kasse {
         return preisInRappen == 0;
     }
 
+    private List<Muenzsaeule> getReversedMuenzsaulen() {
+        List<Muenzsaeule> list = new ArrayList<Muenzsaeule>(Arrays.asList(muenzsaeulen));
+        Collections.reverse(list);
+        return list;
+    }
+
     public void kaufen(Ware ware) {
         saldo.setzteSaldo(saldo.inRappen() - gibRappen(ware.getPreis()));
         verkaufteWaren.add(new VerkaufteWare(ware.getWarenName(), ware.getPreis(), ware.getVerfallsDatum(), SystemSoftware.gibAktuellesDatum()));
     }
 
     public List<VerkaufteWare> gibVerkaufteWare(VerkaufteWarenFilter filter) {
-        List<VerkaufteWare> gefilterteVerkaufteWaren = new ArrayList<VerkaufteWare>();
-        for (VerkaufteWare verkaufteWare : verkaufteWaren) {
-            if (filter.acept(verkaufteWare)) {
-                gefilterteVerkaufteWaren.add(verkaufteWare);
-            }
-        }
-        return gefilterteVerkaufteWaren;
+        return verkaufteWaren.stream().filter(w -> filter.acept(w)).collect(Collectors.toList());
     }
 
     public static int auf5RappenRunden(int rappen) {

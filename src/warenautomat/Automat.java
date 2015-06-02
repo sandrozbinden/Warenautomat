@@ -1,8 +1,11 @@
 package warenautomat;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Der Automat besteht aus 7 Drehtellern welche wiederum je aus 16 Fächer
@@ -51,9 +54,8 @@ public class Automat {
      *            Das Verfallsdatum der neuen Ware.
      */
     public void fuelleFach(int pDrehtellerNr, String pWarenName, double pPreis, Date pVerfallsDatum) {
-        Drehteller drehteller = gibDrehteller(pDrehtellerNr);
-        drehteller.setzeWareInAktuellesFach(new Ware(pWarenName, pPreis, pVerfallsDatum));
-        drehteller.aktualisiereDrehtellerAnzeige();
+        gibDrehteller(pDrehtellerNr).setzeWareInAktuellesFach(new Ware(pWarenName, pPreis, pVerfallsDatum));
+
     }
 
     private Drehteller gibDrehteller(int pDrehtellerNr) {
@@ -78,10 +80,8 @@ public class Automat {
      * durchgeführt wird wenn ein Fach offen ist.
      */
     public void drehen() {
+        Arrays.stream(drehtellern).forEach(d -> d.drehen());
         SystemSoftware.dreheWarenInGui();
-        for (Drehteller drehteller : drehtellern) {
-            drehteller.drehen();
-        }
     }
 
     public Fach gibFach(int drehtellerPosition) {
@@ -117,7 +117,7 @@ public class Automat {
         if (aktuellesFach.istLeer()) {
             return false;
         } else {
-            Ware ware = aktuellesFach.getWare();
+            Ware ware = aktuellesFach.getWare().get();
             if (ware.istAbgelaufen()) {
                 return false;
             } else if (!kassen.istSaldoVorhanden(ware.getPreis())) {
@@ -137,10 +137,10 @@ public class Automat {
     }
 
     private void wareBestellen(String warenName) {
-        Bestellung bestellung = gibBestellung(warenName);
-        if (bestellung != null) {
-            if (gibAnzahlGueltigeWare(warenName) <= bestellung.getGrenze()) {
-                SystemSoftware.bestellen(warenName, bestellung.getBestellAnzahl());
+        Optional<Bestellung> bestellung = gibBestellung(warenName);
+        if (bestellung.isPresent()) {
+            if (gibAnzahlGueltigeWare(warenName) <= bestellung.get().getGrenze()) {
+                SystemSoftware.bestellen(warenName, bestellung.get().getBestellAnzahl());
             }
         }
     }
@@ -149,14 +149,8 @@ public class Automat {
         return gibWaren(new WarenFilter().mitWarenName(warenName).mitGueltigenWaren()).size();
     }
 
-    private Bestellung gibBestellung(String warenName) {
-        Bestellung aktuelleBestellung = null;
-        for (Bestellung bestellung : bestellungen) {
-            if (bestellung.getWarenName().equals(warenName)) {
-                aktuelleBestellung = bestellung;
-            }
-        }
-        return aktuelleBestellung;
+    private Optional<Bestellung> gibBestellung(String warenName) {
+        return bestellungen.stream().filter(b -> b.getWarenName().equals(warenName)).findFirst();
     }
 
     /**
@@ -188,15 +182,23 @@ public class Automat {
      * @return Der totale Warenwert des Automaten.
      */
     public double gibTotalenWarenWert() {
-        int totalerWarenWertRappen = 0;
-        for (Ware gueltigeWare : gibGueltigeWaren()) {
-            totalerWarenWertRappen = totalerWarenWertRappen + Kasse.gibRappen(gueltigeWare.getPreis());
-        }
-        for (Ware abgelaufeneWare : gibAbgelaufeneWaren()) {
-            int zehnProzentInRappen = Kasse.gibRappen(abgelaufeneWare.getPreis() * 0.1);
-            totalerWarenWertRappen = totalerWarenWertRappen + Kasse.auf5RappenRunden(zehnProzentInRappen);
-        }
-        return Kasse.gibFranken(totalerWarenWertRappen);
+        return Kasse.gibFranken(gibGueltigeWarenWertInRappen() + gibAbgelaufenerWarenWertInRappen());
+    }
+
+    private int gibGueltigeWarenWertInRappen() {
+        return gibGueltigeWarenPreiseInRappen().stream().reduce(0, (a, b) -> a + b);
+    }
+
+    private List<Integer> gibGueltigeWarenPreiseInRappen() {
+        return gibGueltigeWaren().stream().map(w -> Kasse.gibRappen(w.getPreis())).collect(Collectors.toList());
+    }
+
+    private int gibAbgelaufenerWarenWertInRappen() {
+        return gibAbgelaufeneWarenPreiseInRappen().stream().reduce(0, (a, b) -> a + b);
+    }
+
+    private List<Integer> gibAbgelaufeneWarenPreiseInRappen() {
+        return gibAbgelaufeneWaren().stream().map(w -> Kasse.auf5RappenRunden(Kasse.gibRappen(w.getPreis() * 0.1))).collect(Collectors.toList());
     }
 
     private List<Ware> gibGueltigeWaren() {
@@ -208,34 +210,19 @@ public class Automat {
     }
 
     private List<Ware> gibWaren(WarenFilter filter) {
-        List<Ware> waren = new ArrayList<Ware>();
-        for (Ware ware : gibWaren()) {
-            if (filter.acept(ware)) {
-                waren.add(ware);
-            }
-        }
-        return waren;
+        return gibWaren().stream().filter(w -> filter.acept(w)).collect(Collectors.toList());
     }
 
     private List<Ware> gibWaren() {
+        return gibVolleFaecher().stream().map(f -> f.getWare().get()).collect(Collectors.toList());
+    }
 
-        List<Ware> waren = new ArrayList<Ware>();
-        for (Fach fach : gibFaecher()) {
-            if (fach.istVoll()) {
-                waren.add(fach.getWare());
-            }
-        }
-        return waren;
+    private List<Fach> gibVolleFaecher() {
+        return gibFaecher().stream().filter(f -> f.istVoll()).collect(Collectors.toList());
     }
 
     public List<Fach> gibFaecher() {
-        List<Fach> faecher = new ArrayList<Fach>();
-        for (Drehteller drehteller : drehtellern) {
-            for (Fach fach : drehteller.gibFaecher()) {
-                faecher.add(fach);
-            }
-        }
-        return faecher;
+        return Arrays.stream(drehtellern).map(d -> d.gibFaecher()).collect(Collectors.toList()).stream().flatMap(l -> l.stream()).collect(Collectors.toList());
     }
 
     /**

@@ -56,7 +56,7 @@ public class WarenFilter {
         if (istMitGueltigenWaren() && !ware.istAbgelaufen()) {
             akzeptiert = true;
         }
-        if (warenName != null && !ware.getWarenName().equals(warenName)) {
+        if (istSpezifischeWare() && !ware.getWarenName().equals(warenName)) {
             akzeptiert = false;
         }
         return akzeptiert;

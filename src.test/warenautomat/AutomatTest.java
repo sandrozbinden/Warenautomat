@@ -25,18 +25,18 @@ public class AutomatTest {
     public void fuelleFachTest() throws ParseException {
         automat.fuelleFach(1, "Eins", 1.00, df.parse("01.01.2001"));
         Fach fach = automat.gibFach(1);
-        assertEquals("Eins", fach.getWare().getWarenName());
-        assertEquals(1.00, fach.getWare().getPreis(), 3);
-        assertEquals("01.01.2001", df.format(fach.getWare().getVerfallsDatum()));
+        assertEquals("Eins", fach.getWare().get().getWarenName());
+        assertEquals(1.00, fach.getWare().get().getPreis(), 3);
+        assertEquals("01.01.2001", df.format(fach.getWare().get().getVerfallsDatum()));
     }
 
     @Test
     public void fuelleFachLastDrehteller() throws ParseException {
         automat.fuelleFach(7, "Eins", 1.00, df.parse("01.01.2001"));
         Fach fach = automat.gibFach(7);
-        assertEquals("Eins", fach.getWare().getWarenName());
-        assertEquals(1.00, fach.getWare().getPreis(), 3);
-        assertEquals("01.01.2001", df.format(fach.getWare().getVerfallsDatum()));
+        assertEquals("Eins", fach.getWare().get().getWarenName());
+        assertEquals(1.00, fach.getWare().get().getPreis(), 3);
+        assertEquals("01.01.2001", df.format(fach.getWare().get().getVerfallsDatum()));
     }
 
     @Test(expected = RuntimeException.class)
@@ -56,9 +56,9 @@ public class AutomatTest {
             automat.drehen();
         }
         Fach fach = automat.gibFach(1);
-        assertEquals("Eins", fach.getWare().getWarenName());
-        assertEquals(1.00, fach.getWare().getPreis(), 3);
-        assertEquals("01.01.2001", df.format(fach.getWare().getVerfallsDatum()));
+        assertEquals("Eins", fach.getWare().get().getWarenName());
+        assertEquals(1.00, fach.getWare().get().getPreis(), 3);
+        assertEquals("01.01.2001", df.format(fach.getWare().get().getVerfallsDatum()));
     }
 
     @Test

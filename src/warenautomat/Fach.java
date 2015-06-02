@@ -1,5 +1,7 @@
 package warenautomat;
 
+import java.util.Optional;
+
 public class Fach {
 
     private int fachNummer;
@@ -17,8 +19,8 @@ public class Fach {
         this.ware = ware;
     }
 
-    public Ware getWare() {
-        return ware;
+    public Optional<Ware> getWare() {
+        return Optional.ofNullable(ware);
     }
 
     public int getVerfallsDatumsZustand() {
@@ -41,7 +43,7 @@ public class Fach {
     }
 
     public boolean istLeer() {
-        return ware == null;
+        return !getWare().isPresent();
     }
 
     public boolean istVoll() {
