@@ -115,4 +115,15 @@ public class KassenTest {
         assertEquals(300, Kasse.gibRappen(kasse.gibBetragVerkaufteWaren()));
     }
 
+    @Test
+    public void rundenTest() {
+        assertEquals(5, Kasse.auf5RappenRunden(1));
+        assertEquals(5, Kasse.auf5RappenRunden(2));
+        assertEquals(5, Kasse.auf5RappenRunden(3));
+        assertEquals(5, Kasse.auf5RappenRunden(4));
+        assertEquals(5, Kasse.auf5RappenRunden(5));
+        assertEquals(10, Kasse.auf5RappenRunden(6));
+        assertEquals(10, Kasse.auf5RappenRunden(7));
+    }
+
 }

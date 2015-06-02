@@ -208,4 +208,12 @@ public class Kasse {
         return verkaufteWare;
     }
 
+    public static int auf5RappenRunden(int rappen) {
+        if (rappen % 5 == 0) {
+            return rappen;
+        } else {
+            return rappen + (5 - rappen % 5);
+        }
+    }
+
 }

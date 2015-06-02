@@ -1,6 +1,8 @@
 package warenautomat;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Der Automat besteht aus 7 Drehtellern welche wiederum je aus 16 Fächer
@@ -14,6 +16,7 @@ public class Automat {
     private static final int NR_DREHTELLER = 7;
     private Drehteller[] drehtellern = new Drehteller[NR_DREHTELLER];
     private Kasse kassen;
+    private List<Bestellung> bestellungen = new ArrayList<Bestellung>();
 
     /**
      * Der Standard-Konstruktor. <br>
@@ -127,9 +130,59 @@ public class Automat {
                 SystemSoftware.entriegeln(pDrehtellerNr);
                 aktuellesFach.entleeren();
                 kassen.kaufen(ware);
+                wareBestellen(ware.getWarenName());
                 return true;
             }
         }
+    }
+
+    private void wareBestellen(String warenName) {
+        Bestellung bestellung = gibBestellung(warenName);
+        if (bestellung != null) {
+            if (gibAnzahlGueltigeWare(warenName) <= bestellung.getGrenze()) {
+                SystemSoftware.bestellen(warenName, bestellung.getBestellAnzahl());
+            }
+        }
+    }
+
+    private int gibAnzahlGueltigeWare(String warenName) {
+        int anzahl = 0;
+        for (Ware ware : gibGueltigeWaren()) {
+            if (ware.getWarenName().equals(warenName)) {
+                anzahl = anzahl + 1;
+            }
+        }
+        return anzahl;
+    }
+
+    private Bestellung gibBestellung(String warenName) {
+        Bestellung aktuelleBestellung = null;
+        for (Bestellung bestellung : bestellungen) {
+            if (bestellung.getWarenName().equals(warenName)) {
+                aktuelleBestellung = bestellung;
+            }
+        }
+        return aktuelleBestellung;
+    }
+
+    /**
+     * Konfiguration einer automatischen Bestellung. <br>
+     * Der Automat setzt automatisch Bestellungen ab mittels
+     * <code> SystemSoftware.bestellen() </code> wenn eine Ware ausgeht.
+     * 
+     * @param pWarenName
+     *            Warenname derjenigen Ware, für welche eine automatische
+     *            Bestellung konfiguriert wird.
+     * @param pGrenze
+     *            Grenze bei welcher Anzahl von verbleibenden, nicht
+     *            abgelaufener Waren im Automat eine Bestellung abgesetzt werden
+     *            soll (Bestellung wenn Waren-Anzahl nicht abgelaufener Waren <=
+     *            pGrenze).
+     * @param pBestellAnzahl
+     *            Wieviele neue Waren jeweils bestellt werden sollen.
+     */
+    public void konfiguriereBestellung(String pWarenName, int pGrenze, int pBestellAnzahl) {
+        bestellungen.add(new Bestellung(pWarenName, pGrenze, pBestellAnzahl));
     }
 
     /**
@@ -142,14 +195,38 @@ public class Automat {
      */
     public double gibTotalenWarenWert() {
         int totalerWarenWertRappen = 0;
+        for (Ware gueltigeWare : gibGueltigeWaren()) {
+            totalerWarenWertRappen = totalerWarenWertRappen + Kasse.gibRappen(gueltigeWare.getPreis());
+        }
+        for (Ware abgelaufeneWare : gibAbgelaufeneWaren()) {
+            int zehnProzentInRappen = Kasse.gibRappen(abgelaufeneWare.getPreis() * 0.1);
+            totalerWarenWertRappen = totalerWarenWertRappen + Kasse.auf5RappenRunden(zehnProzentInRappen);
+        }
+        return Kasse.gibFranken(totalerWarenWertRappen);
+    }
+
+    private List<Ware> gibGueltigeWaren() {
+        List<Ware> gueltigeWaren = new ArrayList<Ware>();
         for (Drehteller drehteller : drehtellern) {
             for (Fach fach : drehteller.gibFaecher()) {
-                if (fach.istVoll()) {
-                    totalerWarenWertRappen = totalerWarenWertRappen + Kasse.gibRappen(fach.getWarenPreis());
+                if (fach.istVoll() && !fach.getWare().istAbgelaufen()) {
+                    gueltigeWaren.add(fach.getWare());
                 }
             }
         }
-        return Kasse.gibFranken(totalerWarenWertRappen);
+        return gueltigeWaren;
+    }
+
+    private List<Ware> gibAbgelaufeneWaren() {
+        List<Ware> gueltigeWaren = new ArrayList<Ware>();
+        for (Drehteller drehteller : drehtellern) {
+            for (Fach fach : drehteller.gibFaecher()) {
+                if (fach.istVoll() && fach.getWare().istAbgelaufen()) {
+                    gueltigeWaren.add(fach.getWare());
+                }
+            }
+        }
+        return gueltigeWaren;
     }
 
     /**

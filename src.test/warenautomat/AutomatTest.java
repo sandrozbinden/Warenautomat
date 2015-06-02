@@ -126,6 +126,7 @@ public class AutomatTest {
 
     @Test
     public void testWarenwert() throws ParseException {
+        SystemSoftware.setzeAktuellesDatum(df.parse("01.01.1998"));
         automat.fuelleFach(1, "Eins", 1.00, df.parse("01.01.1999"));
         automat.fuelleFach(2, "Zwei", 2.00, df.parse("01.01.1999"));
         automat.fuelleFach(3, "DreiEinhalb", 3.50, df.parse("01.01.1999"));
@@ -134,6 +135,19 @@ public class AutomatTest {
         automat.fuelleFach(1, "Eins", 1.00, df.parse("01.01.1999"));
         automat.fuelleFach(4, "Vier", 4.00, df.parse("01.01.1999"));
         assertEquals(1150, Kasse.gibRappen(automat.gibTotalenWarenWert()));
+    }
+
+    @Test
+    public void testWarenwert10ProzentAbgelaufenWare() throws ParseException {
+        SystemSoftware.setzeAktuellesDatum(df.parse("01.01.1998"));
+        automat.fuelleFach(1, "Eins", 1.00, df.parse("01.01.1999"));
+        automat.fuelleFach(2, "Zwei", 2.00, df.parse("01.01.1997"));
+        automat.fuelleFach(3, "DreiEinhalb", 3.50, df.parse("01.01.1999"));
+        assertEquals(470, Kasse.gibRappen(automat.gibTotalenWarenWert()));
+        automat.drehen();
+        automat.fuelleFach(1, "Eins", 3.00, df.parse("01.01.1997"));
+        automat.fuelleFach(4, "Vier", 4.00, df.parse("01.01.1999"));
+        assertEquals(900, Kasse.gibRappen(automat.gibTotalenWarenWert()));
     }
 
     @Test
@@ -157,6 +171,24 @@ public class AutomatTest {
         SystemSoftware.setzeAktuellesDatum(df.parse("01.02.2000"));
         automat.oeffnen(2);
         assertEquals(2, automat.gibVerkaufsStatistik("Eins", df.parse("01.01.2000")));
+    }
+
+    @Test
+    public void konfiguriereBestellung() throws ParseException {
+        SystemSoftware.setzeAktuellesDatum(df.parse("01.01.2000"));
+        automat.fuelleFach(1, "Eins", 1.00, df.parse("01.01.2100"));
+        automat.fuelleFach(2, "Eins", 1.00, df.parse("01.01.2100"));
+        automat.fuelleFach(3, "Eins", 1.00, df.parse("01.01.2100"));
+        automat.fuelleFach(4, "Eins", 1.00, df.parse("01.01.2100"));
+        automat.fuelleFach(5, "Eins", 1.00, df.parse("01.01.2100"));
+        automat.fuelleFach(6, "Eins", 1.00, df.parse("01.01.1900"));
+        automat.konfiguriereBestellung("Eins", 3, 5);
+        automat.gibKasse().einnehmen(1);
+        automat.gibKasse().einnehmen(1);
+        automat.gibKasse().einnehmen(1);
+        automat.oeffnen(1);
+        automat.oeffnen(2);
+        automat.oeffnen(3);
     }
 
     @Test
