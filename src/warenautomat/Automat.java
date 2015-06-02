@@ -146,13 +146,7 @@ public class Automat {
     }
 
     private int gibAnzahlGueltigeWare(String warenName) {
-        int anzahl = 0;
-        for (Ware ware : gibGueltigeWaren()) {
-            if (ware.getWarenName().equals(warenName)) {
-                anzahl = anzahl + 1;
-            }
-        }
-        return anzahl;
+        return gibWaren(new WarenFilter().mitWarenName(warenName).mitGueltigenWaren()).size();
     }
 
     private Bestellung gibBestellung(String warenName) {
@@ -206,35 +200,42 @@ public class Automat {
     }
 
     private List<Ware> gibGueltigeWaren() {
-        List<Ware> gueltigeWaren = new ArrayList<Ware>();
-        for (Ware ware : gibWaren()) {
-            if (!ware.istAbgelaufen()) {
-                gueltigeWaren.add(ware);
-            }
-        }
-        return gueltigeWaren;
+        return gibWaren(new WarenFilter().mitGueltigenWaren());
     }
 
     private List<Ware> gibAbgelaufeneWaren() {
-        List<Ware> abgelaufene = new ArrayList<Ware>();
-        for (Ware ware : gibWaren()) {
-            if (ware.istAbgelaufen()) {
-                abgelaufene.add(ware);
-            }
-        }
-        return abgelaufene;
+        return gibWaren(new WarenFilter().mitAbgelaufenenWaren());
     }
 
-    private List<Ware> gibWaren() {
+    private List<Ware> gibWaren(WarenFilter filter) {
         List<Ware> waren = new ArrayList<Ware>();
-        for (Drehteller drehteller : drehtellern) {
-            for (Fach fach : drehteller.gibFaecher()) {
-                if (fach.istVoll()) {
-                    waren.add(fach.getWare());
-                }
+        for (Ware ware : gibWaren()) {
+            if (filter.acept(ware)) {
+                waren.add(ware);
             }
         }
         return waren;
+    }
+
+    private List<Ware> gibWaren() {
+
+        List<Ware> waren = new ArrayList<Ware>();
+        for (Fach fach : gibFaecher()) {
+            if (fach.istVoll()) {
+                waren.add(fach.getWare());
+            }
+        }
+        return waren;
+    }
+
+    public List<Fach> gibFaecher() {
+        List<Fach> faecher = new ArrayList<Fach>();
+        for (Drehteller drehteller : drehtellern) {
+            for (Fach fach : drehteller.gibFaecher()) {
+                faecher.add(fach);
+            }
+        }
+        return faecher;
     }
 
     /**
@@ -248,15 +249,7 @@ public class Automat {
      * @return Anzahl verkaufter Waren.
      */
     public int gibVerkaufsStatistik(String pName, Date pDatum) {
-        int totalVerkaufteWare = 0;
-        for (VerkaufteWare verkaufteWare : kassen.gibVerkaufteWare()) {
-            if (verkaufteWare.getWarenName().equals(pName)) {
-                if (SystemSoftware.gibAktuellesDatum().getTime() >= pDatum.getTime()) {
-                    totalVerkaufteWare = totalVerkaufteWare + 1;
-                }
-            }
-        }
-        return totalVerkaufteWare;
+        return kassen.gibVerkaufteWare(new VerkaufteWarenFilter().mitWarenName(pName).mitWarenVerkauftNach(pDatum)).size();
     }
 
 }

@@ -18,7 +18,7 @@ public class Kasse {
     private Muenzsaeule[] muenzsaeulen = new Muenzsaeule[MAX_MUENZSAULE];
     private double muenzFuellBetrag;
     private int muenzFuellAnzahl;
-    private List<VerkaufteWare> verkaufteWare = new ArrayList<>();
+    private List<VerkaufteWare> verkaufteWaren = new ArrayList<>();
     private Saldo saldo = new Saldo();
 
     /**
@@ -170,8 +170,8 @@ public class Kasse {
      */
     public double gibBetragVerkaufteWaren() {
         double betragVerkaufteWare = 0;
-        for (VerkaufteWare verkaufteWaren : verkaufteWare) {
-            betragVerkaufteWare = betragVerkaufteWare + verkaufteWaren.getPreis();
+        for (VerkaufteWare verkaufteWaree : verkaufteWaren) {
+            betragVerkaufteWare = betragVerkaufteWare + verkaufteWaree.getPreis();
         }
         return betragVerkaufteWare;
     }
@@ -201,11 +201,17 @@ public class Kasse {
 
     public void kaufen(Ware ware) {
         saldo.setzteSaldo(saldo.inRappen() - gibRappen(ware.getPreis()));
-        verkaufteWare.add(new VerkaufteWare(ware.getWarenName(), ware.getPreis(), ware.getVerfallsDatum(), SystemSoftware.gibAktuellesDatum()));
+        verkaufteWaren.add(new VerkaufteWare(ware.getWarenName(), ware.getPreis(), ware.getVerfallsDatum(), SystemSoftware.gibAktuellesDatum()));
     }
 
-    public List<VerkaufteWare> gibVerkaufteWare() {
-        return verkaufteWare;
+    public List<VerkaufteWare> gibVerkaufteWare(VerkaufteWarenFilter filter) {
+        List<VerkaufteWare> gefilterteVerkaufteWaren = new ArrayList<VerkaufteWare>();
+        for (VerkaufteWare verkaufteWare : verkaufteWaren) {
+            if (filter.acept(verkaufteWare)) {
+                gefilterteVerkaufteWaren.add(verkaufteWare);
+            }
+        }
+        return gefilterteVerkaufteWaren;
     }
 
     public static int auf5RappenRunden(int rappen) {
