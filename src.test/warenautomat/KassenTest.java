@@ -126,4 +126,10 @@ public class KassenTest {
         assertEquals(10, Kasse.auf5RappenRunden(7));
     }
 
+    @Test
+    public void kaufMaennischRundenTest() {
+        assertEquals(1, Kasse.gibRappen(0.005));
+        assertEquals(11, Kasse.gibRappen(0.105));
+        assertEquals(101, Kasse.gibRappen(1.01));
+    }
 }
