@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Der Automat besteht aus 7 Drehtellern welche wiederum je aus 16 Fächer
@@ -27,9 +28,7 @@ public class Automat {
      * instanziert).
      */
     public Automat() {
-        for (int i = 0; i < NR_DREHTELLER; i++) {
-            drehtellern[i] = new Drehteller(i + 1);
-        }
+        IntStream.range(0, NR_DREHTELLER).forEach(i -> drehtellern[i] = new Drehteller(i + 1));
         kassen = new Kasse();
     }
 
@@ -157,7 +156,7 @@ public class Automat {
      * Konfiguration einer automatischen Bestellung. <br>
      * Der Automat setzt automatisch Bestellungen ab mittels
      * <code> SystemSoftware.bestellen() </code> wenn eine Ware ausgeht.
-     * 
+     *
      * @param pWarenName
      *            Warenname derjenigen Ware, für welche eine automatische
      *            Bestellung konfiguriert wird.
