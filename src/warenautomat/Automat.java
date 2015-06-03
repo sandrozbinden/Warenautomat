@@ -18,9 +18,9 @@ import java.util.stream.IntStream;
 public class Automat {
 
     private static final int NR_DREHTELLER = 7;
-    private Drehteller[] drehtellern = new Drehteller[NR_DREHTELLER];
-    private Kasse kassen;
-    private List<Bestellung> bestellungen = new ArrayList<Bestellung>();
+    private final Drehteller[] drehtellern = new Drehteller[NR_DREHTELLER];
+    private final Kasse kassen;
+    private final List<Bestellung> bestellungen = new ArrayList<Bestellung>();
 
     /**
      * Der Standard-Konstruktor. <br>
@@ -54,7 +54,6 @@ public class Automat {
      */
     public void fuelleFach(int pDrehtellerNr, String pWarenName, double pPreis, Date pVerfallsDatum) {
         gibDrehteller(pDrehtellerNr).setzeWareInAktuellesFach(new Ware(pWarenName, pPreis, pVerfallsDatum));
-
     }
 
     private Drehteller gibDrehteller(int pDrehtellerNr) {

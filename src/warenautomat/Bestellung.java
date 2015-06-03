@@ -2,9 +2,9 @@ package warenautomat;
 
 public class Bestellung {
 
-    private String warenName;
-    private int grenze;
-    private int bestellAnzahl;
+    private final String warenName;
+    private final int grenze;
+    private final int bestellAnzahl;
 
     public Bestellung(String warenName, int grenze, int bestellAnzahl) {
         this.warenName = warenName;
