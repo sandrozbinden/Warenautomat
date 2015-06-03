@@ -7,6 +7,9 @@
 *.war
 *.ear
 
+exrep/client/warenautomat/checkin/dummy
+exrep/client/warenautomat/checkin/src.zip
+
 build
 bin
 
