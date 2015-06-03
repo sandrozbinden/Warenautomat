@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -17,8 +18,8 @@ import java.util.stream.Collectors;
  */
 public class Kasse {
 
-    private static final int MAX_MUENZSAULE = 5;
-    private Muenzsaeule[] muenzsaeulen = new Muenzsaeule[MAX_MUENZSAULE];
+    private List<Muenzsaeule> muenzsaeulen;
+    private static final Integer[] MUENZSAULEN_BETRAEGE_IN_RAPPEN = { 10, 20, 50, 100, 200 };
     private double muenzFuellBetrag;
     private int muenzFuellAnzahl;
     private List<VerkaufteWare> verkaufteWaren = new ArrayList<>();
@@ -29,11 +30,7 @@ public class Kasse {
      * Führt die nötigen Initialisierungen durch.
      */
     public Kasse() {
-        muenzsaeulen[0] = new Muenzsaeule(10);
-        muenzsaeulen[1] = new Muenzsaeule(20);
-        muenzsaeulen[2] = new Muenzsaeule(50);
-        muenzsaeulen[3] = new Muenzsaeule(100);
-        muenzsaeulen[4] = new Muenzsaeule(200);
+        muenzsaeulen = Collections.unmodifiableList(Arrays.stream(MUENZSAULEN_BETRAEGE_IN_RAPPEN).map(r -> new Muenzsaeule(r)).collect(Collectors.toList()));
     }
 
     /**
@@ -71,7 +68,7 @@ public class Kasse {
     }
 
     private boolean istMuenzAuffuellBetragUnterstuetzt(int muenzBetragInRappen) {
-        return Arrays.stream(muenzsaeulen).filter(m -> m.getMuenzartInRappen() == muenzBetragInRappen).findAny().isPresent();
+        return muenzsaeulen.stream().filter(m -> m.getMuenzartInRappen() == muenzBetragInRappen).findAny().isPresent();
     }
 
     /**
@@ -125,19 +122,13 @@ public class Kasse {
     }
 
     public Muenzsaeule gibMuenzsaeule(double muenzArtFranken) {
-        int muenzArtRappen = gibRappen(muenzArtFranken);
-        if (muenzArtRappen == 10) {
-            return muenzsaeulen[0];
-        } else if (muenzArtRappen == 20) {
-            return muenzsaeulen[1];
-        } else if (muenzArtRappen == 50) {
-            return muenzsaeulen[2];
-        } else if (muenzArtRappen == 100) {
-            return muenzsaeulen[3];
-        } else if (muenzArtRappen == 200) {
-            return muenzsaeulen[4];
+        Optional<Muenzsaeule> muenzSaule = muenzsaeulen.stream().filter(m -> m.getMuenzartInRappen() == gibRappen(muenzArtFranken)).findFirst();
+        if (muenzSaule.isPresent()) {
+            return muenzSaule.get();
+        } else {
+            throw new RuntimeException("Finde keine Muenzsaeule fuer muenzArt: " + muenzArtFranken);
         }
-        throw new RuntimeException("Finde keine Muenzsaeule fuer muenzArt: " + muenzArtFranken);
+
     }
 
     /**
@@ -192,7 +183,7 @@ public class Kasse {
     }
 
     private List<Muenzsaeule> getReversedMuenzsaulen() {
-        List<Muenzsaeule> list = new ArrayList<Muenzsaeule>(Arrays.asList(muenzsaeulen));
+        List<Muenzsaeule> list = new ArrayList<Muenzsaeule>(muenzsaeulen);
         Collections.reverse(list);
         return list;
     }
