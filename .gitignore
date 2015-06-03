@@ -9,6 +9,7 @@
 
 exrep/client/warenautomat/checkin/dummy
 exrep/client/warenautomat/checkin/src.zip
+ExRepClient.log.*
 
 build
 bin
