@@ -2,6 +2,7 @@ package warenautomat;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.IntStream;
 
 public class Drehteller {
 
@@ -12,9 +13,7 @@ public class Drehteller {
 
     public Drehteller(int drehtellerNummer) {
         this.drehtellerNummer = drehtellerNummer;
-        for (int i = 0; i < MAX_FAECHER; i++) {
-            faecher[i] = new Fach(i);
-        }
+        IntStream.range(0, MAX_FAECHER).forEach(i -> faecher[i] = new Fach(i));
         aktuellesFach = faecher[0];
     }
 
