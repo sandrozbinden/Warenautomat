@@ -1,5 +1,9 @@
 package warenautomat;
 
+import static query.WarenQuery.WARE;
+import static query.WarenQuery.WARENNAME;
+import static query.WarenQuery.where;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -8,9 +12,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import criterion.AbgelaufeneWareCriterion;
+import query.WarenQuery;
 import criterion.GueltigeWareCriterion;
-import criterion.VerkauftNachCriterion;
 import criterion.WarennameEqualsCriterion;
 
 /**
@@ -205,11 +208,16 @@ public class Automat {
     }
 
     private List<Ware> gibGueltigeWaren() {
-        return new GueltigeWareCriterion().matchCriterion(gibWaren());
+        return gibWaren(where(WARE.istGueltig()));
     }
 
     private List<Ware> gibAbgelaufeneWaren() {
-        return new AbgelaufeneWareCriterion().matchCriterion(gibWaren());
+        return gibWaren(where(WARE.istAbgelaufen()));
+    }
+
+    private List<Ware> gibWaren(WarenQuery<Ware> query) {
+        return query.execute(gibWaren());
+
     }
 
     private List<Ware> gibWaren() {
@@ -235,6 +243,6 @@ public class Automat {
      * @return Anzahl verkaufter Waren.
      */
     public int gibVerkaufsStatistik(String pName, Date pDatum) {
-        return new WarennameEqualsCriterion(pName).and(new VerkauftNachCriterion(pDatum)).matchCriterion(kassen.gibVerkaufteWaren()).size();
+        return kassen.gibVerkaufteWaren(where(WARENNAME.equal(pName)).and(WARE.istVerkauftNach(pDatum))).size();
     }
 }

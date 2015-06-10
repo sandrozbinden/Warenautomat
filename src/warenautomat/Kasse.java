@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import query.WarenQuery;
+
 /**
  * Die Kasse verwaltet das eingenommene Geld sowie das Wechselgeld. <br>
  * Die Kasse hat fünf Münz-Säulen für: <br>
@@ -203,6 +205,10 @@ public class Kasse {
         } else {
             return rappen + (5 - rappen % 5);
         }
+    }
+
+    public List<VerkaufteWare> gibVerkaufteWaren(WarenQuery<VerkaufteWare> query) {
+        return query.execute(gibVerkaufteWaren());
     }
 
 }
