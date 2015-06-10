@@ -192,7 +192,7 @@ public class Automat {
     }
 
     private int gibGueltigeWarenWertInRappen() {
-        return gibGueltigeWarenPreiseInRappen().stream().reduce(0, (a, b) -> a + b);
+        return summe(gibGueltigeWarenPreiseInRappen());
     }
 
     private List<Integer> gibGueltigeWarenPreiseInRappen() {
@@ -200,7 +200,11 @@ public class Automat {
     }
 
     private int gibAbgelaufenerWarenWertInRappen() {
-        return gibAbgelaufeneWarenPreiseInRappen().stream().reduce(0, (a, b) -> a + b);
+        return summe(gibAbgelaufeneWarenPreiseInRappen());
+    }
+
+    private int summe(List<Integer> werte) {
+        return werte.stream().mapToInt(Integer::intValue).sum();
     }
 
     private List<Integer> gibAbgelaufeneWarenPreiseInRappen() {
