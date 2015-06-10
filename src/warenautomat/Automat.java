@@ -25,9 +25,9 @@ import criterion.WarennameEqualsCriterion;
  */
 public class Automat {
 
-    private static final int NR_DREHTELLER = 7;
-    private final Drehteller[] drehtellern = new Drehteller[NR_DREHTELLER];
-    private final Kasse kassen;
+    private static final int ANZAHL_DREHTELLER = 7;
+    private final Drehteller[] drehtellern = new Drehteller[ANZAHL_DREHTELLER];
+    private final Kasse kasse;
     private final List<Bestellung> bestellungen = new ArrayList<Bestellung>();
 
     /**
@@ -36,8 +36,8 @@ public class Automat {
      * instanziert).
      */
     public Automat() {
-        IntStream.range(0, NR_DREHTELLER).forEach(i -> drehtellern[i] = new Drehteller(i + 1));
-        kassen = new Kasse();
+        IntStream.range(0, ANZAHL_DREHTELLER).forEach(i -> drehtellern[i] = new Drehteller(i + 1));
+        kasse = new Kasse();
     }
 
     /**
@@ -72,7 +72,7 @@ public class Automat {
      * Gibt die Objekt-Referenz auf die <em> Kasse </em> zurück.
      */
     public Kasse gibKasse() {
-        return kassen;
+        return kasse;
     }
 
     /**
@@ -126,16 +126,16 @@ public class Automat {
             Ware ware = aktuellesFach.getWare().get();
             if (ware.istAbgelaufen()) {
                 return false;
-            } else if (!kassen.istSaldoVorhanden(ware.getPreis())) {
+            } else if (!kasse.istSaldoVorhanden(ware.getPreis())) {
                 SystemSoftware.zeigeZuWenigGeldAn();
                 return false;
-            } else if (!kassen.istWechselGeldVorhanden(ware.getPreis())) {
+            } else if (!kasse.istWechselGeldVorhanden(ware.getPreis())) {
                 SystemSoftware.zeigeZuWenigWechselGeldAn();
                 return false;
             } else {
                 SystemSoftware.entriegeln(pDrehtellerNr);
                 aktuellesFach.entleeren();
-                kassen.kaufen(ware);
+                kasse.kaufen(ware);
                 wareBestellen(ware.getWarenName());
                 return true;
             }
@@ -243,6 +243,6 @@ public class Automat {
      * @return Anzahl verkaufter Waren.
      */
     public int gibVerkaufsStatistik(String pName, Date pDatum) {
-        return kassen.gibVerkaufteWaren(where(WARENNAME.equal(pName)).and(WARE.istVerkauftNach(pDatum))).size();
+        return kasse.gibVerkaufteWaren(where(WARENNAME.equal(pName)).and(WARE.istVerkauftNach(pDatum))).size();
     }
 }
