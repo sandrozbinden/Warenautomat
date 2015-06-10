@@ -8,6 +8,12 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import criterion.ANDCriterion;
+import criterion.AbgelaufeneWareCriterion;
+import criterion.GueltigeWareCriterion;
+import criterion.VerkauftNachCriterion;
+import criterion.WarennameEqualsCriterion;
+
 /**
  * Der Automat besteht aus 7 Drehtellern welche wiederum je aus 16 Fächer
  * bestehen. <br>
@@ -144,7 +150,7 @@ public class Automat {
     }
 
     private int gibAnzahlGueltigeWare(String warenName) {
-        return gibWaren(new WarenFilter().mitWarenName(warenName).mitGueltigenWaren()).size();
+        return new ANDCriterion(new WarennameEqualsCriterion(warenName), new GueltigeWareCriterion()).matchCriterion(gibWaren()).size();
     }
 
     private Optional<Bestellung> gibBestellung(String warenName) {
@@ -200,15 +206,11 @@ public class Automat {
     }
 
     private List<Ware> gibGueltigeWaren() {
-        return gibWaren(new WarenFilter().mitGueltigenWaren());
+        return new GueltigeWareCriterion().matchCriterion(gibWaren());
     }
 
     private List<Ware> gibAbgelaufeneWaren() {
-        return gibWaren(new WarenFilter().mitAbgelaufenenWaren());
-    }
-
-    private List<Ware> gibWaren(WarenFilter filter) {
-        return gibWaren().stream().filter(w -> filter.acept(w)).collect(Collectors.toList());
+        return new AbgelaufeneWareCriterion().matchCriterion(gibWaren());
     }
 
     private List<Ware> gibWaren() {
@@ -234,7 +236,7 @@ public class Automat {
      * @return Anzahl verkaufter Waren.
      */
     public int gibVerkaufsStatistik(String pName, Date pDatum) {
-        return kassen.gibVerkaufteWare(new VerkaufteWarenFilter().mitWarenName(pName).mitWarenVerkauftNach(pDatum)).size();
+        return new ANDCriterion(new WarennameEqualsCriterion(pName), new VerkauftNachCriterion(pDatum)).matchCriterion(kassen.gibVerkaufteWaren()).size();
     }
 
 }

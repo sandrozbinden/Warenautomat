@@ -193,8 +193,8 @@ public class Kasse {
         verkaufteWaren.add(new VerkaufteWare(ware.getWarenName(), ware.getPreis(), ware.getVerfallsDatum(), SystemSoftware.gibAktuellesDatum()));
     }
 
-    public List<VerkaufteWare> gibVerkaufteWare(VerkaufteWarenFilter filter) {
-        return verkaufteWaren.stream().filter(w -> filter.acept(w)).collect(Collectors.toList());
+    public List<VerkaufteWare> gibVerkaufteWaren() {
+        return verkaufteWaren;
     }
 
     public static int auf5RappenRunden(int rappen) {
