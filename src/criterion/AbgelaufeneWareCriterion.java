@@ -19,10 +19,10 @@ import warenautomat.Ware;
  * @author $Author$
  * @owner Sandro Mario Zbinden
  */
-public class AbgelaufeneWareCriterion implements Criterion<Ware> {
+public class AbgelaufeneWareCriterion<T extends Ware> extends BaseCriterion<T> {
 
     @Override
-    public List<Ware> matchCriterion(List<Ware> values) {
+    public List<T> matchCriterion(List<T> values) {
         return values.stream().filter(w -> w.istAbgelaufen()).collect(Collectors.toList());
     }
 

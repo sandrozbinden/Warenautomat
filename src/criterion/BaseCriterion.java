@@ -7,8 +7,6 @@
  */
 package criterion;
 
-import java.util.List;
-
 /**
  *
  * @version $Revision$
@@ -16,18 +14,10 @@ import java.util.List;
  * @author $Author$
  * @owner Sandro Mario Zbinden
  */
-public class ANDCriterion<T> extends BaseCriterion<T> {
-
-    private Criterion<T> first;
-    private Criterion<T> second;
-
-    ANDCriterion(Criterion<T> first, Criterion<T> second) {
-        this.first = first;
-        this.second = second;
-    }
+public abstract class BaseCriterion<T> implements Criterion<T> {
 
     @Override
-    public List<T> matchCriterion(List<T> values) {
-        return second.matchCriterion(first.matchCriterion(values));
+    public Criterion<T> and(Criterion<T> second) {
+        return new ANDCriterion(this, second);
     }
 }

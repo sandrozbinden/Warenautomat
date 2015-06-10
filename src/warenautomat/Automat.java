@@ -8,7 +8,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import criterion.ANDCriterion;
 import criterion.AbgelaufeneWareCriterion;
 import criterion.GueltigeWareCriterion;
 import criterion.VerkauftNachCriterion;
@@ -150,7 +149,7 @@ public class Automat {
     }
 
     private int gibAnzahlGueltigeWare(String warenName) {
-        return new ANDCriterion(new WarennameEqualsCriterion(warenName), new GueltigeWareCriterion()).matchCriterion(gibWaren()).size();
+        return new WarennameEqualsCriterion(warenName).and(new GueltigeWareCriterion()).matchCriterion(gibWaren()).size();
     }
 
     private Optional<Bestellung> gibBestellung(String warenName) {
@@ -236,7 +235,6 @@ public class Automat {
      * @return Anzahl verkaufter Waren.
      */
     public int gibVerkaufsStatistik(String pName, Date pDatum) {
-        return new ANDCriterion(new WarennameEqualsCriterion(pName), new VerkauftNachCriterion(pDatum)).matchCriterion(kassen.gibVerkaufteWaren()).size();
+        return new WarennameEqualsCriterion(pName).and(new VerkauftNachCriterion(pDatum)).matchCriterion(kassen.gibVerkaufteWaren()).size();
     }
-
 }

@@ -19,7 +19,7 @@ import warenautomat.Ware;
  * @author $Author$
  * @owner Sandro Mario Zbinden
  */
-public class WarennameEqualsCriterion implements Criterion<Ware> {
+public class WarennameEqualsCriterion<T extends Ware> extends BaseCriterion<T> {
 
     private final String warenname;
 
@@ -28,7 +28,7 @@ public class WarennameEqualsCriterion implements Criterion<Ware> {
     }
 
     @Override
-    public List<Ware> matchCriterion(List<Ware> values) {
+    public List<T> matchCriterion(List<T> values) {
         return values.stream().filter(w -> w.getWarenName().equalsIgnoreCase(warenname)).collect(Collectors.toList());
     }
 

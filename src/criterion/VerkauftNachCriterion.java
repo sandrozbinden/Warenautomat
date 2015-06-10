@@ -20,7 +20,7 @@ import warenautomat.VerkaufteWare;
  * @author $Author$
  * @owner Sandro Mario Zbinden
  */
-public class VerkauftNachCriterion implements Criterion<VerkaufteWare> {
+public class VerkauftNachCriterion extends BaseCriterion<VerkaufteWare> {
 
     private Date verkauftNachDatum;
 

@@ -19,4 +19,6 @@ import java.util.List;
 public interface Criterion<T> {
 
     List<T> matchCriterion(List<T> values);
+
+    Criterion<T> and(Criterion<T> second);
 }
