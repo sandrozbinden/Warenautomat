@@ -22,7 +22,7 @@ public class ANDCriterion<T> extends BaseCriterion<T> {
     private Criterion<T> second;
 
     public ANDCriterion(Criterion<T> first, Criterion<T> second) {
-        this.irst = first;
+        this.first = first;
         this.second = second;
     }
 
